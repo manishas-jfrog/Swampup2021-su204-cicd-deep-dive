@@ -10,15 +10,6 @@ resources:
       branches:
         include: master
 
-  # - name: app_docker_img
-  #   type: Image
-  #   configuration:
-  #     registry: {{ .Values.artifactoryIntegration }}                                # <-- replace with your artifactory integration
-  #     sourceRepository: {{ .Values.sourceRepository }}               # <-- required if registry is Artifactory
-  #     imageName: {{ .Values.artifactoryUrl }}/{{ .Values.sourceRepository }}/{{ .Values.imageName }}  # < -- replace with your image path and name
-  #     imageTag: latest
-  #     autoPull: false
-
   - name: app_buildinfo
     type: BuildInfo
     configuration:
@@ -69,8 +60,6 @@ pipelines:
       - name: app_promote_build
         type: PromoteBuild
         configuration:
-          #failOnValidate: true
-          #copy: true
           targetRepository: {{ .Values.prodRepository }}
           comment: "promoted via pipeline ${pipeline_name} in run number ${run_number}"
           inputResources:
@@ -89,9 +78,5 @@ pipelines:
         execution:
           onStart:
             - jfrog rt docker-pull {{ .Values.artifactoryUrl }}/{{ .Values.prodRepository }}/{{ .Values.imageName }}:$res_app_promoted_buildinfo_buildNumber {{ .Values.prodRepository }}
-            #- jfrog rt dl prod-go-local/app
-            #- ls -latr
           onExecute:
             - docker run {{ .Values.artifactoryUrl }}/{{ .Values.prodRepository }}/{{ .Values.imageName }}:$res_app_promoted_buildinfo_buildNumber
-            #- chmod +x app
-            #- ./app
